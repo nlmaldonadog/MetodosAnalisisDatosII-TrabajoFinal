@@ -1,0 +1,77 @@
+---
+title: "TrabajoEvaluacion"
+author: 
+  - "Miguel Santiago Gómez Suárez"
+  - "Nicolás Leornardo Maldonado Garzón"
+date: "2024-01-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Trabajo Final
+
+En este trabajo se realizará el estudio de:
+
+  * Análisis previo de los datos.
+  * Análisis de componentes principales.
+  * Análisis Factorial.
+  * Análisis de conglomerados.
+
+Todo esto se hará sobre el conjunto de datos de prueba [Wine Quality](https://archive.ics.uci.edu/dataset/186/wine+quality)
+
+## Análisis previo de los datos
+
+Cargamos nuestros datos y observamos nuestros 5 primero y los 5 últimos datos de nuestro dataSet.
+
+*Nota: Es importante tener en cuenta que es necesario mover el directorio de trabajo a la ubicación del proyecto*
+
+```{r Wine Data Set Charge}
+datos_vino <- read.csv("../Datos/Brutos/winequality-white.csv", sep = ";")
+
+head(datos_vino)
+```
+```{r}
+tail(datos_vino)
+
+```
+Ahora observamos un resumen de nuestros datos:
+
+```{r}
+summary(datos_vino)
+```
+
+- La acidez fija (`fixed.acidity`) varía entre 3.8 y 14.2, con una mediana de 6.8. Esto indica que la mitad de los vinos tienen una acidez fija de 6.8 o menos.
+
+- La acidez volátil (`volatile.acidity`) tiene un rango similar, pero su mediana es menor (0.26), lo que indica que la mayoría de los vinos tienen una acidez volátil bastante baja.
+
+- El azúcar residual (`residual.sugar`) tiene un rango muy amplio, desde 0.6 hasta 65.8. Su mediana es 5.2, lo que indica que la mitad de los vinos tienen un azúcar residual de 5.2 o menos.
+
+- Los cloruros (`chlorides`) varían entre 0.009 y 0.346, con una mediana de 0.043. Esto indica que la mayoría de los vinos tienen un nivel de cloruros bastante bajo.
+
+- El dióxido de azufre libre (`free.sulfur.dioxide`) y el dióxido de azufre total (`total.sulfur.dioxide`) tienen rangos bastante amplios, lo que indica una gran variabilidad en estos valores entre los vinos.
+
+- La densidad (`density`) de los vinos varía poco, con una mediana de 0.9937.
+
+- El pH varía entre 2.72 y 3.82, con una mediana de 3.18. Esto indica que la mayoría de los vinos tienen un pH ligeramente ácido.
+
+- Los sulfatos (`sulphates`) varían entre 0.22 y 1.08, con una mediana de 0.47.
+
+- El alcohol (`alcohol`) varía entre 8 y 14.2, con una mediana de 10.4. Esto indica que la mitad de los vinos tienen un contenido de alcohol de 10.4% o menos.
+
+- La calidad (`quality`) de los vinos varía entre 3 y 9, con una mediana de 6. Esto indica que la mayoría de los vinos tienen una calidad media.
+
+
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

@@ -24,6 +24,8 @@ Todo esto se hará sobre el conjunto de datos de prueba [Wine Quality](https://a
 
 ## Análisis previo de los datos
 
+### Estadisticos
+
 Cargamos nuestros datos y observamos nuestros 5 primero y los 5 últimos datos de nuestro dataSet.
 
 *Nota: Es importante tener en cuenta que es necesario mover el directorio de trabajo a la ubicación del proyecto*
@@ -63,15 +65,230 @@ summary(datos_vino)
 
 - La calidad (`quality`) de los vinos varía entre 3 y 9, con una mediana de 6. Esto indica que la mayoría de los vinos tienen una calidad media.
 
+**Coeficiente de asimetría**
 
+Para el calculo del coeficiente de asimetría usamos la función proporcionada en las practicas. Esta está contenida en nuestros scripts, así que los cargamos.
 
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r cargar funciones, echo=FALSE}
+source("../Scripts/computacion.R")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Luego, realizamos el calculo del coeficiente.
+
+```{r }
+apply(datos_vino, 2, asim)
+
+```
+De lo anterior podemos decir que:
+
+- `fixed.acidity`, `volatile.acidity`, `citric.acid`, `residual.sugar`, `chlorides`, `free.sulfur.dioxide`, `density`, `pH`, `sulphates` y `alcohol` tienen asimetría positiva. Esto significa que estas variables tienen una cola a la derecha, es decir, un número de valores extremadamente altos.
+
+- En particular, `chlorides` tiene un coeficiente de asimetría muy alto (5.02), lo que indica una fuerte asimetría positiva. Esto sugiere que hay algunos vinos con un nivel de cloruros mucho más alto que la mayoría.
+
+- `total.sulfur.dioxide` tiene una asimetría positiva más baja (0.39), lo que indica que su distribución es más simétrica que las otras variables.
+
+- `quality` tiene un coeficiente de asimetría cercano a 0 (0.15), lo que indica que su distribución es bastante simétrica. Esto sugiere que hay un equilibrio entre los vinos de calidad inferior y superior.
+
+**Estadisticos por calidades de vinos**
+
+```{r estadisticos vinos}
+
+# Crea una copia de datos_vino sin la columna quality
+datos_vino_sin_quality <- datos_vino[, !(names(datos_vino) %in% "quality")]
+
+# Aplica aggregate() a cada columna de datos_vino_sin_quality
+resultados <- lapply(datos_vino_sin_quality, function(x) {
+    aggregate(x = x,
+              by = list(datos_vino$quality),
+              FUN = function(x) return(c(media = mean(x), varianza = var(x), asim = asim(x))))
+})
+
+resultados
+
+```
+De lo anterior podemos ver que:
+
+1. La acidez fija (`fixed.acidity`) tiende a aumentar con la calidad del vino. Los vinos de calidad 9 tienen la mayor media y varianza.
+
+2. La acidez volátil (`volatile.acidity`) tiende a disminuir a medida que aumenta la calidad del vino. Los vinos de calidad 3 tienen la mayor media y varianza.
+
+3. El ácido cítrico (`citric.acid`) parece aumentar ligeramente con la calidad del vino. Los vinos de calidad 9 tienen la mayor media.
+
+4. El azúcar residual (`residual.sugar`) no muestra una tendencia clara con respecto a la calidad del vino.
+
+5. Los cloruros (`chlorides`) tienden a disminuir a medida que aumenta la calidad del vino.
+
+6. El dióxido de azufre libre (`free.sulfur.dioxide`) y total (`total.sulfur.dioxide`) no muestran una tendencia clara con respecto a la calidad del vino.
+
+7. La densidad (`density`) tiende a disminuir a medida que aumenta la calidad del vino.
+
+8. El pH no muestra una tendencia clara con respecto a la calidad del vino.
+
+9. Los sulfatos (`sulphates`) parecen aumentar ligeramente con la calidad del vino.
+
+10. El alcohol (`alcohol`) tiende a aumentar con la calidad del vino. Los vinos de calidad 9 tienen la mayor media y varianza.
+
+**Matriz de Covarianza**
+
+Usando la función definida en las practicas obtenemos la matriz de covarianza
+
+```{r Matriz de covarianza}
+mcov(datos_vino)
+
+```
+De lo anterior podemos ver que:
+
+1. `fixed.acidity` y `volatile.acidity`: La covarianza es negativa, lo que indica que tienden a moverse en direcciones opuestas. Cuando la acidez fija aumenta, la acidez volátil tiende a disminuir, y viceversa.
+
+2. `fixed.acidity` y `citric.acid`: La covarianza es positiva, lo que indica que tienden a moverse juntas. Cuando la acidez fija aumenta, el ácido cítrico también tiende a aumentar.
+
+3. `fixed.acidity` y `residual.sugar`: La covarianza es positiva, lo que indica que tienden a moverse juntas. Cuando la acidez fija aumenta, el azúcar residual también tiende a aumentar.
+
+4. `volatile.acidity` y `residual.sugar`: La covarianza es positiva, lo que indica que tienden a moverse juntas. Cuando la acidez volátil aumenta, el azúcar residual también tiende a aumentar.
+
+5. `citric.acid` y `residual.sugar`: La covarianza es positiva, lo que indica que tienden a moverse juntas. Cuando el ácido cítrico aumenta, el azúcar residual también tiende a aumentar.
+
+**Matriz de correlaciones**
+
+```{r}
+cor(datos_vino)
+```
+De lo anterior podemos decir que:
+
+1. `fixed.acidity` y `density`: Tienen una correlación positiva de 0.27, lo que indica una relación moderada. A medida que la acidez fija aumenta, la densidad también tiende a aumentar.
+
+2. `volatile.acidity` y `quality`: Tienen una correlación negativa de -0.19, lo que indica una relación débil. A medida que la acidez volátil aumenta, la calidad tiende a disminuir.
+
+3. `residual.sugar` y `density`: Tienen una correlación positiva muy fuerte de 0.84, lo que indica que a medida que el azúcar residual aumenta, la densidad también tiende a aumentar.
+
+4. `chlorides` y `quality`: Tienen una correlación negativa de -0.21, lo que indica una relación débil. A medida que los cloruros aumentan, la calidad tiende a disminuir.
+
+5. `free.sulfur.dioxide` y `total.sulfur.dioxide`: Tienen una correlación positiva fuerte de 0.62, lo que indica que a medida que el dióxido de azufre libre aumenta, el dióxido de azufre total también tiende a aumentar.
+
+6. `alcohol` y `density`: Tienen una correlación negativa muy fuerte de -0.78, lo que indica que a medida que el alcohol aumenta, la densidad tiende a disminuir.
+
+7. `alcohol` y `quality`: Tienen una correlación positiva de 0.44, lo que indica una relación moderada. A medida que el alcohol aumenta, la calidad también tiende a aumentar.
+
+### Visualización de nuestros datos
+
+**Histograma de nuestros datos**
+
+```{r}
+library(ggplot2)
+
+# Obtén los nombres de las columnas de tu conjunto de datos
+columnas <- names(datos_vino)
+
+datos_vino$quality <- factor(datos_vino$quality)
+
+# Excluye la columna 'quality' ya que es la que usaremos para el relleno
+columnas <- columnas[columnas != "quality"]
+
+# Crea un histograma para cada columna
+for (columna in columnas) {
+  p <- ggplot(datos_vino, aes_string(x = columna, fill = "quality")) +
+    geom_histogram(binwidth = .5, position = "identity", alpha = 0.5) +
+    labs(x = columna, y = "Count", fill = "Quality") +
+    theme_minimal()
+  
+  # Imprime el gráfico en la consola
+  print(p)
+  
+  # Guarda el gráfico en un archivo
+  ggsave(paste0("../Figuras/histograma_", columna, ".png"), plot = p)
+}
+
+```
+En el anterior apartado generamos cada una de las graficas de los histogramas de cada una de las variables de nuestro dataSet y las dividimos coloreadas por el tipo de calidad de los vinos.
+
+Algo que se puede resaltar es que, la cantidad de alcohol en un vino tiene relación con la calificación en su calidad.
+
+**Diagrama de bigotes**
+
+```{r}
+library(reshape2)
+
+# Reorganiza los datos en formato largo
+datos_largos <- melt(datos_vino)
+
+# Crea el gráfico
+p <- ggplot(datos_largos, aes(x = variable, y = value, fill = factor(quality))) +
+  geom_boxplot() +
+  facet_wrap(~ variable, scales = "free") +
+  theme_minimal() +
+  labs(x = "", y = "", fill = "Quality")
+
+# Imprime el gráfico
+print(p)
+
+# Guarda el gráfico en un archivo
+ggsave("../Figuras/diagramas_bigotes_por_calidad.png", plot = p)
+```
+De los diagramas de bigotes anteriores podemos observar que, todas las variables poseen datos atipicos. Y que estos datos tienen en cada una de las calidades una cantidad amplia de las mismas.
+
+**Grafico de dispersión**
+
+```{r}
+
+library(GGally)
+
+# Crea el diagrama de dispersión
+p <- ggpairs(datos_vino)
+
+# Imprime el gráfico
+print(p)
+
+
+# Guarda el gráfico en un archivo
+ggsave("../Figuras/diagrama_dispersion.png", plot = p, width = 20, height = 20)
+```
+Del diagrama de dispersión podemos ver el resumen de todas las anteriores graficas realizadas. Por otro lado, podemos ver cómo la forma de todas las distribuciones de nuestros datos vienen siendo parecidas a una forma gaussiana.
+
+## Análisis de componentes principales
+
+Para realizar el análisis de las componentes principales de nuestro dataSet, haremos uso de la función que trae R ya integrada.
+
+```{r}
+vinos_acp <- prcomp(datos_vino_sin_quality)
+summary(vinos_acp)
+plot(vinos_acp, type = "l", pch = 19)
+
+```
+De lo anteriore podemos decir que:
+
+La primera componente principal (PC1) explica aproximadamente el 90.97% de la variabilidad en tus datos. Esto es bastante significativo y sugiere que una gran parte de la información en tus datos puede ser resumida por esta única componente.
+
+La segunda componente principal (PC2) explica un 7.93% adicional de la variabilidad, llevando el total acumulado a 98.89%. Esto significa que PC1 y PC2 juntas capturan casi toda la variabilidad en tus datos.
+
+Las componentes restantes (PC3 a PC11) explican muy poca variabilidad adicional. Esto se puede ver en la proporción acumulada de la varianza, que llega a 1 (o 100%) ya en la PC9.
+
+En términos prácticos, esto sugiere que se podría reducir la dimensionalidad de tus datos a sólo dos dimensiones (PC1 y PC2) sin perder mucha información.
+
+Ahora miremos cómo cada variable contribuye a la componente:
+
+```{r}
+vinos_acp$rotation[, 1:2]
+
+```
+De lo anterior podemos decir que:
+
+- La primera componente principal (PC1) está fuertemente influenciada por `total.sulfur.dioxide` y `free.sulfur.dioxide`, con coeficientes de -9.638576e-01 y -2.618770e-01 respectivamente. Esto indica que estos dos factores son los más importantes en la variación de los datos a lo largo de PC1.
+
+- La segunda componente principal (PC2) está principalmente influenciada por `free.sulfur.dioxide`, con un coeficiente de 9.646854e-01. Esto indica que este factor es el más importante en la variación de los datos a lo largo de PC2.
+
+- Las demás variables tienen coeficientes relativamente pequeños en ambas componentes principales, lo que indica que tienen menos influencia en la variación de los datos a lo largo de estas direcciones.
+
+- En general, estos resultados sugieren que `total.sulfur.dioxide` y `free.sulfur.dioxide` son los factores más importantes en la variación de los datos de vino.
+
+Tenemos tambien, el siguiente grafico que nos resume la relación entre las componentes.
+
+```{r}
+biplot(vinos_acp)
+
+```
+
+De lo anterior podemos decir que, la segunda componenete es una composición entre el alcohol, los chloridres, la azucar residual y el total de dioxido de sulfuro.
+
+Por otro lado, la primera componente se compone del PH y de la acides ajustada.
+
+

@@ -1,12 +1,13 @@
 ---
 title: "TrabajoEvaluacion"
 author:
-- Miguel Santiago Gómez Suárez       - AX751708
-- Nicolás Leornardo Maldonado Garzón - AX840282
+- "Miguel Santiago Gómez Suárez       - AX751708"
+- "Nicolás Leornardo Maldonado Garzón - AX840282"
 date: "2024-01-15"
 output:
-  pdf_document: default
+  word_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}

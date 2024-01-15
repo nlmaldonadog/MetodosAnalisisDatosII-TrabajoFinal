@@ -1,9 +1,9 @@
 ---
 title: "TrabajoEvaluacion"
 author:
-- Miguel Santiago Gómez Suárez
-- Nicolás Leornardo Maldonado Garzón
-date: "2024-01-14"
+- Miguel Santiago Gómez Suárez       - AX751708
+- Nicolás Leornardo Maldonado Garzón - AX840282
+date: "2024-01-15"
 output:
   pdf_document: default
   html_document: default
@@ -260,67 +260,112 @@ Del diagrama de dispersión podemos ver el resumen de todas las anteriores grafi
 Para realizar el análisis de las componentes principales de nuestro dataSet, haremos uso de la función que trae R ya integrada.
 
 ```{r}
-vinos_acp <- prcomp(datos_vino_sin_quality)
+vinos_acp <- prcomp(datos_vino_sin_quality, scale. = TRUE)
 summary(vinos_acp)
 plot(vinos_acp, type = "l", pch = 19)
 
+
+png("../Figuras/diagrama_metodo_codo.png")
+plot(vinos_acp, type = "l", pch = 19)
+dev.off()
 ```
 
 De lo anterior podemos decir que:
 
-La primera componente principal (PC1) explica aproximadamente el 90.97% de la variabilidad en tus datos. Esto es bastante significativo y sugiere que una gran parte de la información en tus datos puede ser resumida por esta única componente.
-
-La segunda componente principal (PC2) explica un 7.93% adicional de la variabilidad, llevando el total acumulado a 98.89%. Esto significa que PC1 y PC2 juntas capturan casi toda la variabilidad en tus datos.
-
-Las componentes restantes (PC3 a PC11) explican muy poca variabilidad adicional. Esto se puede ver en la proporción acumulada de la varianza, que llega a 1 (o 100%) ya en la PC9.
-
-En términos prácticos, esto sugiere que se podría reducir la dimensionalidad de tus datos a sólo dos dimensiones (PC1 y PC2) sin perder mucha información.
+- La primera componente principal (PC1) explica el 29.29% de la varianza en los datos. Esto indica que PC1 captura una gran parte de la información en el conjunto de datos.
+- La segunda componente principal (PC2) explica un 14.32% adicional de la varianza, llevando el total acumulado a 43.61%.
+- La tercera componente principal (PC3) explica un 11.11% adicional de la varianza, llevando el total acumulado a 54.72%.
+- Las componentes principales restantes (PC4 a PC11) explican el resto de la varianza, con cada una explicando una cantidad decreciente.
+- En total, las primeras tres componentes principales (PC1, PC2 y PC3) explican más del 50% de la varianza en los datos. Esto sugiere que estas tres componentes principales pueden ser suficientes para capturar la mayoría de la información en el conjunto de datos.
+- La última componente principal (PC11) explica solo el 0.188% de la varianza, lo que sugiere que esta componente principal puede no ser muy útil para entender la variación en los datos.
+- En general, estos resultados sugieren que se podría reducir la dimensionalidad del conjunto de datos a tres o quizás incluso dos dimensiones sin perder demasiada información.
 
 Ahora miremos cómo cada variable contribuye a la componente:
 
 ```{r}
-vinos_acp$rotation[, 1:2]
+vinos_acp$rotation[, 1:3]
 
 ```
 
 De lo anterior podemos decir que:
 
--   La primera componente principal (PC1) está fuertemente influenciada por `total.sulfur.dioxide` y `free.sulfur.dioxide`, con coeficientes de -9.638576e-01 y -2.618770e-01 respectivamente. Esto indica que estos dos factores son los más importantes en la variación de los datos a lo largo de PC1.
+- La primera componente principal (PC1) está fuertemente influenciada por `density`, `total.sulfur.dioxide`, `residual.sugar`, y `free.sulfur.dioxide`, con coeficientes de 0.511523597, 0.406652203, 0.427408368, y 0.300334387 respectivamente. Esto indica que estos factores son los más importantes en la variación de los datos a lo largo de PC1.
 
--   La segunda componente principal (PC2) está principalmente influenciada por `free.sulfur.dioxide`, con un coeficiente de 9.646854e-01. Esto indica que este factor es el más importante en la variación de los datos a lo largo de PC2.
+- La segunda componente principal (PC2) está principalmente influenciada por `fixed.acidity` y `pH`, con coeficientes de -0.587558208 y 0.581344397 respectivamente. Esto indica que estos factores son los más importantes en la variación de los datos a lo largo de PC2.
 
--   Las demás variables tienen coeficientes relativamente pequeños en ambas componentes principales, lo que indica que tienen menos influencia en la variación de los datos a lo largo de estas direcciones.
+- La tercera componente principal (PC3) está fuertemente influenciada por `volatile.acidity`, `citric.acid`, y `sulphates`, con coeficientes de -0.5909715, 0.5043969, y 0.4332440 respectivamente. Esto indica que estos factores son los más importantes en la variación de los datos a lo largo de PC3.
 
--   En general, estos resultados sugieren que `total.sulfur.dioxide` y `free.sulfur.dioxide` son los factores más importantes en la variación de los datos de vino.
+- En general, estos resultados sugieren que `density`, `total.sulfur.dioxide`, `residual.sugar`, `free.sulfur.dioxide`, `fixed.acidity`, `pH`, `volatile.acidity`, `citric.acid`, y `sulphates` son los factores más importantes en la variación de los datos de vino.
 
 Tenemos tambien, el siguiente grafico que nos resume la relación entre las componentes.
 
+
 ```{r}
-biplot(vinos_acp)
+# Genera un biplot con solo las primeras 5 variables
+# Subconjunta vinos_acp$x para incluir solo las primeras 50 observaciones
+vinos_acp_sub <- vinos_acp
+vinos_acp_sub$x <- vinos_acp$x[1:50,1:2]
+biplot(vinos_acp_sub)
+# Genera un biplot con las primeras 50 observaciones
+png("../Figuras/diagrama_biplot1.png", width = 2000, height = 2000, res = 300)
+biplot(vinos_acp_sub)
+dev.off()
 
 ```
 
-De lo anterior podemos decir que, la segunda componenete es una composición entre el alcohol, los chloridres, la azucar residual y el total de dioxido de sulfuro.
+```{r}
+# Genera un biplot con solo las primeras 5 variables
+# Subconjunta vinos_acp$x para incluir solo las primeras 50 observaciones
+vinos_acp_sub <- vinos_acp
+vinos_acp_sub$x <- vinos_acp$x[1:50,2:3]
+biplot(vinos_acp_sub)
+# Genera un biplot con las primeras 50 observaciones
+png("../Figuras/diagrama_biplot2.png", width = 2000, height = 2000, res = 300)
+biplot(vinos_acp_sub)
+dev.off()
 
-Por otro lado, la primera componente se compone del PH y de la acides ajustada.
+```
+
+```{r}
+# Genera un biplot con solo las primeras 5 variables
+# Subconjunta vinos_acp$x para incluir solo las primeras 50 observaciones
+vinos_acp_sub <- vinos_acp
+vinos_acp_sub$x <- vinos_acp$x[1:50, c(1,3)]
+biplot(vinos_acp_sub)
+# Genera un biplot con las primeras 50 observaciones
+png("../Figuras/diagrama_biplot3.png", width = 2000, height = 2000, res = 300)
+biplot(vinos_acp_sub)
+dev.off()
+
+```
+De lo anterior podemos decir que, la primera componente es una composición entre el alcohol, los chloridres, la azucar residual y el total de dioxido de sulfuro.
+
+Por otro lado, la segunda componente principalmente del PH y de la acides ajustada.
+
+Aunque para la relación entre la componente 1 y la componente 2 el Alcohol tiene una relevancia alta para la componente 1. Al contrastar con la componente 3 nos damos cuenta que, para dicha componente el aporte que el alcohol hace a esta, contrastando contra la componente 2, es mucho menor, ya que no se muestra un vector diagonal en el alcohol en dicho resultado y vemos cómo casi el vector de alcohol es paralelo a la componente 2.
 
 ## Análisis Factorial
 
 En este caso igualmente usaremos la funcion integrada de R para realizar el analisis factorial usando el metodo de las componentes principales.
 
-Aplicamos el analisis factorial, eliminando el factor que no queremos incluir en el analisis. Definimos como 2 el numero de factores, tomando el resultado del analisis de componentes previo y escogemos la rotación varimax, para simplificar la interpretación de los factores.
+Aplicamos el analisis factorial, eliminando el factor que no queremos incluir en el analisis. Definimos como 3 el numero de factores, tomando el resultado del analisis de componentes previo y escogemos la rotación varimax, para simplificar la interpretación de los factores.
 
 ```{r}
 library(psych)
 
-datos_vinos_af <- principal(datos_vino[, -12], nfactors = 2, rotate = "varimax")
+datos_vinos_af <- principal(datos_vino[, -12], nfactors = 3, rotate = "varimax")
 
 datos_vinos_af$values
 datos_vinos_af$loadings
 datos_vinos_af$communality
 
 ```
-En primera instancia de este analisis podemos ver que el primer factor (RC1)  explica el 28.9% de la varianza en los datos, mientras que el segundo factor (RC2) explica el 14.7% de la varianza. Juntos, estos dos factores explican el 43.6% de la varianza total en los datos, mientras que las cargas factoriales indican la correlación entre las variables originales y los factores. Por ejemplo, la variable density tiene una alta carga en RC1 (0.908), lo que significa que está fuertemente correlacionada con ese factor. Por otro lado, fixed.acidity tiene una alta carga negativa en RC2 (-0.773), lo que indica una fuerte correlación negativa hacia este segundo factor. Finalmente, tenemos que la comunalidad para density es 0.843, lo que significa que el 84.3% de la varianza en density es explicada por los dos factores.
+Vemos que el primer factor explica 3.22 de la varianza, el segundo factor explica 1.57 y el tercer factor explica 1.22. Los factores restantes explican menos de 1 de la varianza, lo que sugiere que los primeros tres factores son los más importantes, confirmando nuestro anterior analisis.
+
+En cuanto a las cargas factoriales, la variable fixed.acidity tiene una alta correlación con el segundo factor (0.791), mientras que residual.sugar tiene una alta correlación con el primer factor (0.782). Las variables que tienen cargas factoriales altas en el mismo factor se pueden considerar como agrupadas o relacionadas, por ende podriamos decir que residual.sugar esta relacionada a total.sulfur.dioxide y a density, al tener cargas altas sobre el primer factor.
+
+Finalmente para las comunalidades, que representan la cantidad de varianza de cada variable que es explicada por los factores, tenemos que la variable density tiene una comunalidad de 0.86, lo que significa que el 86% de su varianza es explicada por los tres factores.
+
 ```{r}
 datos_vinos_af$complexity
 
@@ -329,9 +374,12 @@ comp <- apply(datos_vinos_af$loadings, 1, indice_Hoffman)
 comp
 mean(comp)
 ```
-Ahora obtenemos los indices de complejidad de Hoffman de cada variable, de los cuales podemos apreciar que free.sulfur.dioxide es una variable compleja que puede estar influenciada por varios factores subyacentes, al tener el indice mas alto, seguido por sulphates, evidenciando que ambas variables estan asociadas a varios factores. Por otro lado tenemos al alcohol, que se ve que es una variable menos compleja, influenciada por menos factores subyacentes al tener el indice de complejidad de Hoffman mas bajo con solo 1.020518.
+Ahora obtenemos los indices de complejidad de Hoffman de cada variable, de los cuales podemos apreciar que la variable free.sulfur.dioxide tiene el índice de Hoffman más alto (2.20), lo que indica que es la variable más importante en la formación de los clusters en tus datos. La siguiente variable más importante es citric.acid con un índice de 2.03.
 
-Tambien tenemos que nuestra media de los índices de complejidad es 1.158817, indicando que las variables están moderadamente asociadas con ambos factores.
+Las variables fixed.acidity, residual.sugar, density y alcohol tienen índices de Hoffman cercanos a 1, lo que indica que son menos importantes para la formación de los clusters y que son influenciadas por menos factores subyacentes.
+
+
+Tambien tenemos que nuestra media de los índices de complejidad es 1.334234, indicando que las variables generalmente están asociadas de forma moderada con varios factores.
 
 Procedemos a realizar un diagrama para localizar la mayor carga de cada variable.
 ```{r}
@@ -341,15 +389,26 @@ png("../Figuras/diagrama_analisis_factorial.png")
 fa.diagram(datos_vinos_af)
 dev.off()
 ```
-De este diagrama podemos observar la representación grafica de las cargas en el espacio de los factores, donde vemos que la mayor carga de las variables densidad, alcohol, total.sulfur.dioxide, residual.sugar, free.sulfur.dioxide y chlorides esta sobre el RC1, donde vemos que es bastante alta(teniendo en cuenta el valor absoluto), para las primeras 4 mientras que las ultimas dos, tienen una carga menor. Por otra parte tenemos las variables fixed.acidity, pH y citric.acid, que tienen su mayor carga sobre el RC2.
-
-Finalmente encontramos sulphates y volatile.acidity tienen cargas factoriales bajas en todos los factores. En otras palabras, estas variables no están fuertemente correlacionadas con ninguno de los factores identificados en el análisis factorial, indicando que estas variables podrian ser ruido o valores aleatorios, no relacionadas con los factores subyacentes que estamos tratando de identificar
+De este diagrama podemos observar la representación grafica de las cargas en el espacio de los factores, donde vemos que la mayor carga de las variables densidad, alcohol, total.sulfur.dioxide, residual.sugar, free.sulfur.dioxide y chlorides esta sobre el RC1, donde vemos que es bastante alta(teniendo en cuenta el valor absoluto), para las primeras 4 mientras que las ultimas dos, tienen una carga menor. Por otra parte tenemos las variables fixed.acidity, pH y citric.acid, que tienen su mayor carga sobre el RC2 y finalmente encontramos sulphates y volatile.acidity que tienen carga sobre el RC3. No se encontraron variables que no estuvieran correlacionadas con ninguno de los factores identificados en el análisis factorial.
 
 ## Análisis de conglomerados
 
-Finalmnete realizaremos un analisis de conglomerados, esto lo realizaremos usando el metodo kmeans de clustering, que viene integrado en R. Marcamos nstart igual a 1000, para que el proceso se inicialice 1000 veces diferentes y pueda seleccionar la mejor opción.
+Finalmente realizaremos un analisis de conglomerados, esto lo realizaremos usando el metodo kmeans de clustering, que viene integrado en R. Marcamos nstart igual a 1000, para que el proceso se inicialice 1000 veces diferentes y pueda seleccionar la mejor opción.
+
 ```{r}
-datos_vino_km <- kmeans(datos_vino[, -12], 7, nstart = 1e3)
+valores_unicos <- unique(datos_vino$quality)
+print(valores_unicos)
+```
+
+Procedemos a estandarizar los datos para aplicar el algoritmo de clustering.
+```{r}
+datos_vino_estand <- scale(datos_vino[, -12])
+```
+
+
+
+```{r}
+datos_vino_km <- kmeans(datos_vino_estand[, -12], 7, nstart = 1e3)
 datos_vino_km
 datos_vino_km$tot.withinss
 datos_vino_km$withinss
@@ -360,25 +419,24 @@ Cruzamos estos resultados con nuestra variable Factor(quality) para comparar los
 plot(datos_vino,
   col = datos_vino_km$cluster + 1,
   pch = as.numeric(as.factor(datos_vino$quality)))
-```
-Tomamos las columnas donde se puede apreciar mas facil la separación de las clases en dos dimensiones.
-```{r}
-plot(datos_vino[, 6:8],
+
+png("../Figuras/diagrama_kmeans.png", width = 10000, height = 10000, res = 300)
+plot(datos_vino,
   col = datos_vino_km$cluster + 1,
   pch = as.numeric(as.factor(datos_vino$quality)))
+dev.off()
+```
+```{r}
 table(datos_vino_km$cluster, datos_vino$quality)
 ```
-Procedemos ahora a realizar el analisis por clustering jerarquico aglomerativo.
+De esta matriz podemos observar que:
 
-```{r}
-datos_vino_hcCo <- hclust(datos_vino[, 6:8])
-#plot(datos_vino_hcCo, main = "CJ vecino más lejano", xlab = "", sub = "")
-#datos_vino_hcCo$merge
-#datos_vino_hcS <- hclust(datos_vino, method = "single")
-#plot(datos_vino_hcS, main = "CJ vecino más próximo", xlab = "", sub = "")
-#datos_vino_hcA <- hclust(datos_vino, method = "average")
-#plot(datos_vino_hcA, main = "CJ distancia media", xlab = "", sub = "")
-#datos_vino_hcCe <- hclust(datos_vino, method = "centroid")
-#plot(datos_vino_hcCe, main = "CJ método del centroide", xlab = "", sub = "")
-```
+1. Los clusters 2, 5, 6 y 7 tienen la mayor cantidad de vinos, especialmente de calidad 5 y 6. Esto podría indicar que estos clusters representan vinos de calidad media.
 
+2. El cluster 4, por otro lado, tiene la menor cantidad de vinos en general y parece tener una mayor concentración de vinos de calidad 5 y 6, pero en menor cantidad que los otros clusters.
+
+3. Los vinos de calidad 3 y 9 son muy raros en todos los clusters, lo que indica que estos vinos de calidad extremadamente baja o alta son menos comunes en el conjunto de datos.
+
+4. Los clusters 1, 3 y 7 parecen tener una distribución más equilibrada de calidades de vino, con una ligera predominancia de vinos de calidad 5 o 6.
+
+En conclusión, los clusters generados por el algoritmo k-means parecen agrupar los vinos principalmente en torno a la calidad media (5 y 6), con algunos clusters que tienen una mayor concentración de estas calidades que otros. Los vinos de calidad extremadamente alta o baja son menos comunes y están distribuidos de manera bastante uniforme entre los clusters. Como podemos ver, observamos que los clusters creados por el algoritmo, no se corresponden con los reales, puesto a que los vinos de cada clase se encuentran demasiado dispersos entre todos los clusters creados.
